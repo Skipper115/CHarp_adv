@@ -61,25 +61,47 @@ namespace GKapoustkin_HW_L1
             Buffer.Graphics.Clear(Color.Black);
             foreach (BaseObject obj in _objs)
                 obj.Draw();
-            
+           // foreach (BaseObject obj in _streaks)
+           //    obj.Draw();
+
             Buffer.Render();
         }
         //метод Update для изменения состояния объектов
         public static void Update()
         {
             foreach (BaseObject obj in _objs) obj.Update();
+        //    foreach (BaseObject streak in _streaks) streak.Update();
         }
 
-        // здесь создаётся массив объектов.
+        // здесь создаются массивы объектов.
         public static BaseObject[] _objs;
+       // public static BaseObject[] _streaks;
         // метод Load - должен инициализировать объекты
         public static void Load()
         {
-            _objs = new BaseObject[30];
-            for (int i = 0; i < _objs.Length /2; i++)
+            _objs = new BaseObject[50];
+            for (int i = 0; i < 15; i++)
                 _objs[i] = new ImageStar(new Point(600, i * 20), new Point(- i, -i), new Size(20, 20));
-            for (int i =  _objs.Length / 2; i < _objs.Length; i++)
+            for (int i =  15; i < 30; i++)
                 _objs[i] = new Star(new Point(600, i * 20), new Point(-i, 0), new Size(5, 5));
+            for (int i = 30; i < _objs.Length; i++)
+            {
+                Random random = new Random();
+                int Speed = random.Next(15, 45);
+                int StreakX = random.Next(0, Width);
+                int StreakY = random.Next(0, Height);
+                _objs[i] = new Starstreak(new Point(StreakX, StreakY), new Point(Speed, -i), new Size(Speed, Speed));
+            }
+
+          //  _streaks = new BaseObject[20];
+          //  for (int i = 30; i < _streaks.Length; i++)
+          //  {
+          //      Random random = new Random();
+          //      int Speed = random.Next(0, 45);
+          //      int StreakX = random.Next(0, Width);
+          //      int StreakY = random.Next(0, Height);
+          //      _streaks[i] = new Starstreak(new Point(StreakX , StreakY), new Point(Speed, -i), new Size(Speed, Speed));
+          //  }
         }
     }
 }
