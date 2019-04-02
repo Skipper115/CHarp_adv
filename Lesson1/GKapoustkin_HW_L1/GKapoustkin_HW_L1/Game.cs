@@ -16,12 +16,18 @@ namespace GKapoustkin_HW_L1
         // Ширина и высота игрового поля
         public static int Width { get; set; }
         public static int Height { get; set; }
+        
         static Game() { }
+        // здесь создаются массивы объектов.
+        private static BaseObject[] _objs;
+        private static Bullet _bullet;
+        private static Asteroid[] _asteroids;
+        private static BaseObject[] _streaks;
 
-        // тот самый основной метод INIT
+        //самый основной метод INIT
         public static void Init(Form form)
         {
-            // Графичесоке устройство для вывода графики
+            // Графическое устройство для вывода графики
             Graphics g;
             // по слухам, предоставляет доступ к главному буферу графического контекста для текущего приложения
             _context = BufferedGraphicsManager.Current;
@@ -30,6 +36,8 @@ namespace GKapoustkin_HW_L1
             // Запоминание размеров формы
             Width = form.ClientSize.Width;
             Height = form.ClientSize.Height;
+            if (Width < 100) throw new ArgumentOutOfRangeException();
+            if (Height < 100) throw new ArgumentOutOfRangeException();
             // Связывание буфера в памяти с графическим объектом, чтобы рисовать в буфере
             Buffer = _context.Allocate(g, new Rectangle(0, 0, Width, Height));
             // вызов метода Load, чтобы всё заработало:
@@ -52,17 +60,23 @@ namespace GKapoustkin_HW_L1
         //метод Draw
         public static void Draw()
         {
+            #region Проверка вывода графики из первого урока
             //,проверяем вывод графики
             //Buffer.Graphics.Clear(Color.Black);
             //Buffer.Graphics.DrawRectangle(Pens.White, new Rectangle(100, 100, 200, 200));
             //Buffer.Graphics.FillEllipse(Brushes.Wheat, new Rectangle(100, 100, 200, 200));
             //Buffer.Render();
             //вывод на экран
+            #endregion
+
             Buffer.Graphics.Clear(Color.Black);
             foreach (BaseObject obj in _objs)
                 obj.Draw();
-           // foreach (BaseObject obj in _streaks)
-           //    obj.Draw();
+            foreach (Asteroid asteroid in _asteroids)
+                asteroid.Draw();
+            foreach (Starstreak streak in _streaks)
+                streak.Draw();
+            _bullet.Draw();
 
             Buffer.Render();
         }
@@ -70,38 +84,62 @@ namespace GKapoustkin_HW_L1
         public static void Update()
         {
             foreach (BaseObject obj in _objs) obj.Update();
-        //    foreach (BaseObject streak in _streaks) streak.Update();
+            foreach (Starstreak streak in _streaks) streak.Update();
+            foreach (Asteroid asteroid in _asteroids)
+            {
+                asteroid.Update();
+                if (asteroid.Collision(_bullet))
+                {
+                    System.Media.SystemSounds.Hand.Play();
+                    asteroid.Reborn();
+                    _bullet.Reborn();
+                }
+            }
+            _bullet.Update();
         }
 
-        // здесь создаются массивы объектов.
-        public static BaseObject[] _objs;
-       // public static BaseObject[] _streaks;
-        // метод Load - должен инициализировать объекты
+        
+        // метод Load - инициализация объектов
         public static void Load()
         {
-            _objs = new BaseObject[50];
-            for (int i = 0; i < 15; i++)
-                _objs[i] = new ImageStar(new Point(600, i * 20), new Point(- i, -i), new Size(20, 20));
-            for (int i =  15; i < 30; i++)
-                _objs[i] = new Star(new Point(600, i * 20), new Point(-i, 0), new Size(5, 5));
-            for (int i = 30; i < _objs.Length; i++)
+            #region Load из первого урока
+            //_objs = new BaseObject[50];
+            //for (int i = 0; i < 15; i++)
+            //    _objs[i] = new ImageStar(new Point(600, i * 20), new Point(- i, -i), new Size(20, 20));
+            //for (int i =  15; i < 30; i++)
+            //    _objs[i] = new Star(new Point(600, i * 20), new Point(-i, 0), new Size(5, 5));
+            #endregion
+            #region Обновлённый Load из второго урока
+            _objs = new BaseObject[30];
+            _bullet = new Bullet(new Point(0, 200), new Point(5, 0), new Size(4, 1));
+            _asteroids = new Asteroid[10];
+            _streaks = new Starstreak[25];
+
+            Random random = new Random();
+
+            for (int i = 0; i < _objs.Length; i++) //просто звёзды
             {
-                Random random = new Random();
+                int r = random.Next(5, 50);
+                _objs[i] = new Star(new Point(1000, random.Next(0, Game.Height)), new Point(-r, r), new Size(3, 3));
+            }
+            for (var i = 0; i < _asteroids.Length; i++)  //астероиды
+            {
+                int r = random.Next(5, 50);
+                //проверка работы своего класса исключений
+                //if (r < 41) throw new SizeException("Неверные габариты объекта!");
+                _asteroids[i] = new Asteroid (new Point(random.Next(400, Game.Width), random.Next(0, Game.Height)), new Point(-r/5, r), new Size(r, r));
+                
+            }
+
+            for (int i = 0; i < _streaks.Length; i++)  //быстролетящие звёзды
+            {
                 int Speed = random.Next(15, 45);
                 int StreakX = random.Next(0, Width);
                 int StreakY = random.Next(0, Height);
-                _objs[i] = new Starstreak(new Point(StreakX, StreakY), new Point(Speed, -i), new Size(Speed, Speed));
+                _streaks[i] = new Starstreak(new Point(StreakX, StreakY), new Point(Speed, -i), new Size(Speed, Speed));
             }
-
-          //  _streaks = new BaseObject[20];
-          //  for (int i = 30; i < _streaks.Length; i++)
-          //  {
-          //      Random random = new Random();
-          //      int Speed = random.Next(0, 45);
-          //      int StreakX = random.Next(0, Width);
-          //      int StreakY = random.Next(0, Height);
-          //      _streaks[i] = new Starstreak(new Point(StreakX , StreakY), new Point(Speed, -i), new Size(Speed, Speed));
-          //  }
+            #endregion
+         
         }
     }
 }

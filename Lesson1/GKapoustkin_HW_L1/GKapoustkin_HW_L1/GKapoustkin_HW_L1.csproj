@@ -45,13 +45,21 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Asteroid.cs" />
     <Compile Include="BaseObject.cs" />
+    <Compile Include="Bullet.cs" />
+    <Compile Include="Work.cs" />
+    <Compile Include="Worker.cs" />
     <Compile Include="Game.cs" />
+    <Compile Include="ICollision.cs" />
     <Compile Include="ImageStar.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SizeException.cs" />
     <Compile Include="Star.cs" />
     <Compile Include="Starstreak.cs" />
+    <Compile Include="WorkerFixed.cs" />
+    <Compile Include="WorkerTimed.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
